@@ -20,8 +20,10 @@ with open('BEER_proyecto.csv', newline='') as csvfile:
             esto[1] = float(esto[1])
             esto[2] = float(esto[2])
             esto[3] = float(esto[3])
-            cabeza.append(esto)
-        except: lista.append(esto)
+            lista.append(esto)
+        except: cabeza = esto
+    pprint(lista)
+    print(cabeza)
     diamonds = pd.DataFrame(lista, columns=cabeza)
     # reader = csv.DictReader(csvfile, delimiter=';')
     # for row in reader:
@@ -35,9 +37,9 @@ sns.despine(f)
 sns.histplot(
     diamonds,
     x="PrecioDolares", 
-    # hue="cut",
-    # multiple="dodge",
-    # palette="light:m_r",
+    hue="TipoCerveza",
+    multiple="stack",
+    palette="light:m_r",
     edgecolor=".3",
     linewidth=.5,
     log_scale=True,
@@ -45,5 +47,5 @@ sns.histplot(
     kde= True
 )
 ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
-ax.set_xticks([500, 1000, 2000, 5000, 10000])
+# ax.set_xticks([500, 1000, 2000, 5000, 10000])
 plt.show()
