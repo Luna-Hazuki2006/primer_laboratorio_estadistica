@@ -120,7 +120,7 @@ def procedimiento(busqueda):
     mostrar_tabla(oficial)
     print('*' * 50)
     total = oficial[0]['fa'][-1]
-    print(f'Amplitud: {amplitud}')
+    # print(f'Amplitud: {amplitud}')
     print('Datos de posición: ')
     cuartiles = []
     for i in range(1, 5): 
@@ -180,7 +180,6 @@ def procedimiento(busqueda):
     elif indice > 0: simetria = 'Es asimétrica positiva con sesgo a la derecha'
     elif indice < 0: simetria = 'Es asimétrica negativa con sesgo a la izquierda'
     print(f'Índice de asimetría: {indice} ({simetria})')
-    print('*' * 50)
     if busqueda == 'PorcAlcohol': 
         primera = (5.5 - media) / desviacion
         resultado = 0.7794 * 100
@@ -191,6 +190,14 @@ def procedimiento(busqueda):
         segunda = (4.5 - media) / desviacion
         resultado = (1 - 0.3557) * 100
         print(f'Pocentaje mayor 4.5 de precios es: {resultado}%')
+    if busqueda == 'Calorias': 
+        primera = (150 - media) / desviacion
+        segunda = (180 - media) / desviacion
+        res1 = 1 - 0.5948 
+        res2 = 0.5793
+        resultado = (res2 - res1) * 100
+        print(f'Porcentaje de que las calorías estén entre 150 y 180: {resultado}%')
+    print('*' * 50)
     diagramar(busqueda, plana)
 
 def buscar_modales(fi : list): 
