@@ -22,6 +22,11 @@ with open('BEER_proyecto.csv', newline='') as csvfile:
             esto['PorcAlcohol'] = float(esto['PorcAlcohol'])
         if esto['PaisOrigen'] == '0': esto['PaisOrigen'] = 'EU'
         elif esto['PaisOrigen'] == '1': esto['PaisOrigen'] = 'Importada'
+        if esto['TipoCerveza'] == '1': esto['TipoCerveza'] = 'lager artesanal'
+        elif esto['TipoCerveza'] == '2': esto['TipoCerveza'] = 'clara artesanal'
+        elif esto['TipoCerveza'] == '3': esto['TipoCerveza'] = 'lager importada'
+        elif esto['TipoCerveza'] == '4': esto['TipoCerveza'] = 'cerveza normal y helada'
+        elif esto['TipoCerveza'] == '5': esto['TipoCerveza'] = 'cerveza baja en caloríasy sin alcohol'
         cervezas.append(esto)
     cervezas_pandas = pd.DataFrame(cervezas)
 
@@ -38,10 +43,15 @@ def alcohol():
     procedimiento('PorcAlcohol')
 
 def tipos(): 
-    diagramar
+    lista = ['lager artesanal', 'clara artesanal', 'lager importada', 
+             'cerveza normal y helada', 'cerveza baja en caloríasy sin alcohol']
+    print(lista)
+    diagramar('TipoCerveza', lista)
 
 def paises(): 
-    pass
+    lista = ['EU', 'Importada']
+    print(lista)
+    diagramar('PaisOrigen', lista)
 
 def procedimiento(busqueda): 
     r = list(map(lambda x: x[busqueda], cervezas))
@@ -160,7 +170,7 @@ def procedimiento(busqueda):
     p25 = obtencion(oficial[0], (25 / 100) * total)
     p90 = obtencion(oficial[0], (90 / 100) * total)
     p10 = obtencion(oficial[0], (10 / 100) * total)
-    curtosis = (p75 - p25) / (p90 - p10)
+    curtosis = ((p75 - p25) / (p90 - p10)) * 0.5
     if curtosis == 0: apuntamiento = 'Es mesocúrtica como la normal'
     elif curtosis > 0: apuntamiento = 'Es leptocúrtica apuntada'
     elif curtosis < 0: apuntamiento = 'Es platicúrtica aplanada'
@@ -171,8 +181,16 @@ def procedimiento(busqueda):
     elif indice < 0: simetria = 'Es asimétrica negativa con sesgo a la izquierda'
     print(f'Índice de asimetría: {indice} ({simetria})')
     print('*' * 50)
+    if busqueda == 'PorcAlcohol': 
+        primera = (5.5 - media) / desviacion
+        resultado = 0.7794 * 100
+        print(f'La probabilidad de que el alcohol sea menor a 5.5 es: {resultado}%')
     plana = list(map(lambda x: x['minimo'], real))
     plana.append(real[-1]['maximo']) 
+    if busqueda == 'PrecioDolares': 
+        segunda = (4.5 - media) / desviacion
+        resultado = (1 - 0.3557) * 100
+        print(f'Pocentaje mayor 4.5 de precios es: {resultado}%')
     diagramar(busqueda, plana)
 
 def buscar_modales(fi : list): 
@@ -220,7 +238,7 @@ def obtencion(lista, numero):
     return esto
 
 def diagramar(busqueda, lista): 
-    # print(cervezas_pandas)
+    # pprint(cervezas_pandas)
 
     f, ax = plt.subplots(figsize=(7, 5))
     sns.despine(f)
@@ -233,15 +251,17 @@ def diagramar(busqueda, lista):
         # palette="light:m_r",
         edgecolor=".3",
         linewidth=.5,
-        log_scale=True,
+        log_scale=True, 
         # discrete= True, 
-        kde= True
+        kde=(True if busqueda != 'PaisOrigen' and busqueda != 'TipoCerveza' else False) 
     )
     ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
     ax.set_xticks(lista)
     plt.show()
 
 def main(): 
+    tipos()
+    paises()
     precios()
     calorias()
     alcohol()
