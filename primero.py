@@ -20,6 +20,8 @@ with open('BEER_proyecto.csv', newline='') as csvfile:
             esto['PorcAlcohol'] = 0.01
         else: 
             esto['PorcAlcohol'] = float(esto['PorcAlcohol'])
+        if esto['PaisOrigen'] == '0': esto['PaisOrigen'] = 'EU'
+        elif esto['PaisOrigen'] == '1': esto['PaisOrigen'] = 'Importada'
         cervezas.append(esto)
     cervezas_pandas = pd.DataFrame(cervezas)
 
@@ -35,6 +37,12 @@ def calorias():
 def alcohol(): 
     procedimiento('PorcAlcohol')
 
+def tipos(): 
+    diagramar
+
+def paises(): 
+    pass
+
 def procedimiento(busqueda): 
     r = list(map(lambda x: x[busqueda], cervezas))
     minimo = min(r)
@@ -43,7 +51,6 @@ def procedimiento(busqueda):
     print(f'Cantidad: {n}')
     oficial = []
     if n >= 25 and n <= 400:
-    # if True:  
         rango = maximo - minimo 
         k = 1 + 3.3 * math.log(n, 10)
         amplitud = rango / k
@@ -55,31 +62,20 @@ def procedimiento(busqueda):
         for esto in r: 
             try: lista[esto] += 1
             except: lista[esto] = 1
-        # pprint(lista)
         real = []
         para = 0
-        if amplitud < 1: 
-            while True: 
-                if minimo > maximo: break
-                para = minimo + amplitud 
-                clase = {
-                    'minimo': minimo, 
-                    'maximo': para
-                }
-                minimo = para + 0.01
-                real.append(clase)
-        else: 
-            while True: 
-                if minimo > maximo: break
-                para = minimo + amplitud - 1
-                clase = {
-                    'minimo': minimo, 
-                    'maximo': para
-                }
-                minimo = para + 1
-                real.append(clase)
+        while True: 
+            if minimo > maximo: break
+            if amplitud < 1: para = minimo + amplitud 
+            else: para = minimo + amplitud - 1
+            clase = {
+                'minimo': round(minimo, 2), 
+                'maximo': round(para, 2)
+            }
+            if amplitud < 1: minimo = para + 0.01
+            else: minimo = para + 1
+            real.append(clase)
         oficial = [{'clase': real}]
-        # pprint(oficial)
         oficial[0]['fi'] = []
         for esto in real: 
             numero = 0
@@ -112,9 +108,80 @@ def procedimiento(busqueda):
     oficial[0]['far%'] = list(map(lambda x: x * 100, oficial[0]['far']))
     oficial[0]['fi.xi^2'] = [(xi * fixi) for xi, fixi in zip(oficial[0]['fi.xi'], oficial[0]['xi'])]
     mostrar_tabla(oficial)
+    print('*' * 50)
+    total = oficial[0]['fa'][-1]
+    print(f'Amplitud: {amplitud}')
+    print('Datos de posición: ')
+    cuartiles = []
+    for i in range(1, 5): 
+        q = obtencion(oficial[0], ((25 * i) / 100) * total)
+        print(f'{i}° cuartil: {q}')
+        cuartiles.append(q)
+    print('Datos de centralización: ')
+    media = sum(oficial[0]['fi.xi']) / total
+    print(f'Media aritmética: {media}')
+    calculo = total / 2
+    fa = 0
+    for esto in oficial[0]['fa']: 
+        if esto >= calculo: 
+            fa = esto
+            break
+    indice = oficial[0]['fa'].index(fa)
+    li = oficial[0]['clase'][indice]['minimo']
+    fi_menos = oficial[0]['fa'][indice - 1]
+    fi = oficial[0]['fi'][indice]
+    mediana = li + ((calculo - fi_menos) / fi) * amplitud
+    print(f'Mediana: {mediana}')
+    lugares_modales = buscar_modales(oficial[0]['fi'])
+    modales = []
+    for esto in lugares_modales: 
+        li = oficial[0]['clase'][esto]['minimo']
+        fi = oficial[0]['fi'][esto]
+        try: fi_menos = oficial[0]['fi'][esto - 1]
+        except: fi_menos = 0
+        try: fi_mas = oficial[0]['fi'][esto + 1]
+        except: fi_mas = 0
+        d1 = fi - fi_menos
+        d2 = fi - fi_mas
+        modal = li + (d1 / (d1 + d2)) * amplitud
+        modales.append(modal)
+    print(f'Modales: {modales}')
+    print('Datos de variabilidad: ')
+    varianza = (sum(oficial[0]['fi.xi^2']) / total) - (media ** 2)
+    print(f'Varianza: {varianza}')
+    desviacion = math.sqrt(varianza)
+    print(f'Desviación típica: {desviacion}')
+    coeficiente = (desviacion / media) * 100
+    print(f'Coeficiente de variación: {coeficiente}%')
+    intercuartil = cuartiles[2] - cuartiles[0]
+    print(f'Rango intercuartil: {intercuartil}')
+    print('Datos de forma: ')
+    p75 = obtencion(oficial[0], (75 / 100) * total)
+    p25 = obtencion(oficial[0], (25 / 100) * total)
+    p90 = obtencion(oficial[0], (90 / 100) * total)
+    p10 = obtencion(oficial[0], (10 / 100) * total)
+    curtosis = (p75 - p25) / (p90 - p10)
+    if curtosis == 0: apuntamiento = 'Es mesocúrtica como la normal'
+    elif curtosis > 0: apuntamiento = 'Es leptocúrtica apuntada'
+    elif curtosis < 0: apuntamiento = 'Es platicúrtica aplanada'
+    print(f'Curtosis: {curtosis} ({apuntamiento})')
+    indice = (3 * (media - mediana)) / desviacion
+    if indice == 0: simetria = 'Es simétrica'
+    elif indice > 0: simetria = 'Es asimétrica positiva con sesgo a la derecha'
+    elif indice < 0: simetria = 'Es asimétrica negativa con sesgo a la izquierda'
+    print(f'Índice de asimetría: {indice} ({simetria})')
+    print('*' * 50)
     plana = list(map(lambda x: x['minimo'], real))
     plana.append(real[-1]['maximo']) 
     diagramar(busqueda, plana)
+
+def buscar_modales(fi : list): 
+    lista = []
+    maximo = max(fi)
+    for i in range(len(fi)): 
+        if fi[i] == maximo: 
+            lista.append(i)
+    return lista
 
 def mostrar_tabla(todo : dict): 
     todo = todo[0]
@@ -136,8 +203,24 @@ def mostrar_tabla(todo : dict):
         print(texto)
     print(len(texto) * '-')
 
+def obtencion(lista, numero): 
+    fa = lista['fa']
+    fi = lista['fi']
+    clase = lista['clase']
+    indice = 0
+    for esto in fa: 
+        if esto >= numero: 
+            indice = fa.index(esto)
+            break
+    fa_numero = fa[indice - 1]
+    fi_numero = fi[indice]
+    li = clase[indice]['minimo']
+    amplitud = clase[0]['maximo'] - clase[0]['minimo']
+    esto = li + ((numero - fa_numero) / fi_numero) * amplitud
+    return esto
+
 def diagramar(busqueda, lista): 
-    print(cervezas_pandas)
+    # print(cervezas_pandas)
 
     f, ax = plt.subplots(figsize=(7, 5))
     sns.despine(f)
