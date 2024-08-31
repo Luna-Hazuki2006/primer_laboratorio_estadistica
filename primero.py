@@ -6,7 +6,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from pprint import pprint
 
-sns.set_theme(style="ticks")
+sns.set_theme(style="whitegrid")
 
 cervezas_pandas = []
 cervezas = []
@@ -246,9 +246,9 @@ def diagramar(busqueda, lista):
     sns.histplot(
         cervezas_pandas,
         x=busqueda, 
-        # hue="TipoCerveza",
-        # multiple="stack",
-        # palette="light:m_r",
+        hue="TipoCerveza",
+        multiple="stack",
+        palette="light:m_r",
         edgecolor=".3",
         linewidth=.5,
         log_scale=True, 
