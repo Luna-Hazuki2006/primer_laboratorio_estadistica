@@ -6,7 +6,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from pprint import pprint
 
-sns.set_theme(style="whitegrid")
+sns.set_theme(style='whitegrid')
 
 cervezas_pandas = []
 cervezas = []
@@ -125,11 +125,11 @@ def procedimiento(busqueda):
     cuartiles = []
     for i in range(1, 5): 
         q = obtencion(oficial[0], ((25 * i) / 100) * total)
-        print(f'{i}° cuartil: {q}')
+        print(f'{i}° cuartil: {round(q, 4)}')
         cuartiles.append(q)
     print('Datos de centralización: ')
     media = sum(oficial[0]['fi.xi']) / total
-    print(f'Media aritmética: {media}')
+    print(f'Media aritmética: {round(media, 4)}')
     calculo = total / 2
     fa = 0
     for esto in oficial[0]['fa']: 
@@ -141,7 +141,7 @@ def procedimiento(busqueda):
     fi_menos = oficial[0]['fa'][indice - 1]
     fi = oficial[0]['fi'][indice]
     mediana = li + ((calculo - fi_menos) / fi) * amplitud
-    print(f'Mediana: {mediana}')
+    print(f'Mediana: {round(mediana, 4)}')
     lugares_modales = buscar_modales(oficial[0]['fi'])
     modales = []
     for esto in lugares_modales: 
@@ -155,16 +155,16 @@ def procedimiento(busqueda):
         d2 = fi - fi_mas
         modal = li + (d1 / (d1 + d2)) * amplitud
         modales.append(modal)
-    print(f'Modales: {modales}')
+    print(f'Modales: {[round(esto, 4) for esto in modales]}')
     print('Datos de variabilidad: ')
     varianza = (sum(oficial[0]['fi.xi^2']) / total) - (media ** 2)
-    print(f'Varianza: {varianza}')
+    print(f'Varianza: {round(varianza, 4)}')
     desviacion = math.sqrt(varianza)
-    print(f'Desviación típica: {desviacion}')
+    print(f'Desviación típica: {round(desviacion, 4)}')
     coeficiente = (desviacion / media) * 100
-    print(f'Coeficiente de variación: {coeficiente}%')
+    print(f'Coeficiente de variación: {round(coeficiente, 4)}%')
     intercuartil = cuartiles[2] - cuartiles[0]
-    print(f'Rango intercuartil: {intercuartil}')
+    print(f'Rango intercuartil: {round(intercuartil, 4)}')
     print('Datos de forma: ')
     p75 = obtencion(oficial[0], (75 / 100) * total)
     p25 = obtencion(oficial[0], (25 / 100) * total)
@@ -174,12 +174,12 @@ def procedimiento(busqueda):
     if curtosis == 0: apuntamiento = 'Es mesocúrtica como la normal'
     elif curtosis > 0: apuntamiento = 'Es leptocúrtica apuntada'
     elif curtosis < 0: apuntamiento = 'Es platicúrtica aplanada'
-    print(f'Curtosis: {curtosis} ({apuntamiento})')
+    print(f'Curtosis: {round(curtosis, 4)} ({apuntamiento})')
     indice = (3 * (media - mediana)) / desviacion
     if indice == 0: simetria = 'Es simétrica'
     elif indice > 0: simetria = 'Es asimétrica positiva con sesgo a la derecha'
     elif indice < 0: simetria = 'Es asimétrica negativa con sesgo a la izquierda'
-    print(f'Índice de asimetría: {indice} ({simetria})')
+    print(f'Índice de asimetría: {round(indice, 4)} ({simetria})')
     if busqueda == 'PorcAlcohol': 
         primera = (5.5 - media) / desviacion
         resultado = 0.7794 * 100
@@ -222,8 +222,8 @@ def mostrar_tabla(todo : dict):
             if esto == 'clase': 
                 minimo = todo[esto][i]['minimo']
                 maximo = todo[esto][i]['maximo']
-                texto += f' {minimo}-{maximo} |'
-            else: texto += f' {todo[esto][i]} |'
+                texto += f' {round(minimo, 4)}-{round(maximo, 4)} |'
+            else: texto += f' {round(todo[esto][i], 4)} |'
         print(len(texto) * '-')
         print(texto)
     print(len(texto) * '-')
@@ -253,9 +253,9 @@ def diagramar(busqueda, lista):
     sns.histplot(
         cervezas_pandas,
         x=busqueda, 
-        hue="TipoCerveza",
-        multiple="stack",
-        palette="light:m_r",
+        # hue="TipoCerveza",
+        # multiple="stack",
+        # palette="light:m_r",
         edgecolor=".3",
         linewidth=.5,
         log_scale=True, 
