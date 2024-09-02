@@ -26,21 +26,21 @@ with open('BEER_proyecto.csv', newline='') as csvfile:
         elif esto['TipoCerveza'] == '2': esto['TipoCerveza'] = 'clara artesanal'
         elif esto['TipoCerveza'] == '3': esto['TipoCerveza'] = 'lager importada'
         elif esto['TipoCerveza'] == '4': esto['TipoCerveza'] = 'cerveza normal y helada'
-        elif esto['TipoCerveza'] == '5': esto['TipoCerveza'] = 'cerveza baja en caloríasy sin alcohol'
+        elif esto['TipoCerveza'] == '5': esto['TipoCerveza'] = 'cerveza baja en calorías y sin alcohol'
         cervezas.append(esto)
     cervezas_pandas = pd.DataFrame(cervezas)
 
 def precios(): 
-    procedimiento('PrecioDolares')
+    busqueda_parcial('PrecioDolares')
 
 def calorias(): 
-    procedimiento('Calorias')
+    busqueda_parcial('Calorias')
 
 # Por la forma de datos usar datos no agrupados
 # El 0 para python lo considera inexistente por eso se le tuvo que hacer una
 # Pequeña modificación muy cerca del 0 
 def alcohol(): 
-    procedimiento('PorcAlcohol')
+    busqueda_parcial('PorcAlcohol')
 
 def tipos(): 
     lista = ['lager artesanal', 'clara artesanal', 'lager importada', 
@@ -53,7 +53,21 @@ def paises():
     print(lista)
     diagramar('PaisOrigen', lista)
 
-def procedimiento(busqueda): 
+def busqueda_parcial(busqueda): 
+    r = list(map(lambda x: x[busqueda], cervezas))
+    print(f'Cálculos de la variable {busqueda} completa')
+    procedimiento(busqueda, r, True)
+    lista_tipos = []
+    for esto in cervezas: 
+        if not esto['TipoCerveza'] in lista_tipos: 
+            lista_tipos.append(esto['TipoCerveza'])
+    for esto in lista_tipos: 
+        r = list(filter(lambda x: x['TipoCerveza'] == esto, cervezas))
+        r = list(map(lambda x: x[busqueda], r))
+        print(f'Cálculos de la variable {busqueda} de tipo {esto}')
+        procedimiento(busqueda, r, False)
+
+def procedimiento(busqueda, r, verdad): 
     r = list(map(lambda x: x[busqueda], cervezas))
     minimo = min(r)
     maximo = max(r)
@@ -198,7 +212,7 @@ def procedimiento(busqueda):
         resultado = (res2 - res1) * 100
         print(f'Porcentaje de que las calorías estén entre 150 y 180: {resultado}%')
     print('*' * 50)
-    diagramar(busqueda, plana)
+    if verdad: diagramar(busqueda, plana)
 
 def buscar_modales(fi : list): 
     lista = []
@@ -253,9 +267,9 @@ def diagramar(busqueda, lista):
     sns.histplot(
         cervezas_pandas,
         x=busqueda, 
-        hue="TipoCerveza",
-        multiple="stack",
-        palette="light:m_r",
+        # hue="TipoCerveza",
+        # multiple="dodge",
+        # palette="light:m_r",
         edgecolor=".3",
         linewidth=.5,
         log_scale=True, 
