@@ -46,29 +46,29 @@ def tipos():
     lista = ['lager artesanal', 'clara artesanal', 'lager importada', 
              'cerveza normal y helada', 'cerveza baja en caloríasy sin alcohol']
     print(lista)
-    diagramar('TipoCerveza', lista)
+    diagramar('TipoCerveza', lista, cervezas_pandas)
 
 def paises(): 
     lista = ['EU', 'Importada']
     print(lista)
-    diagramar('PaisOrigen', lista)
+    diagramar('PaisOrigen', lista, cervezas_pandas)
 
 def busqueda_parcial(busqueda): 
     r = list(map(lambda x: x[busqueda], cervezas))
     print(f'Cálculos de la variable {busqueda} completa')
-    procedimiento(busqueda, r, True)
+    procedimiento(busqueda, r, True, cervezas_pandas)
     lista_tipos = []
     for esto in cervezas: 
         if not esto['TipoCerveza'] in lista_tipos: 
             lista_tipos.append(esto['TipoCerveza'])
     for esto in lista_tipos: 
         r = list(filter(lambda x: x['TipoCerveza'] == esto, cervezas))
+        cervezas_pandas_temporal = pd.DataFrame(r)
         r = list(map(lambda x: x[busqueda], r))
         print(f'Cálculos de la variable {busqueda} de tipo {esto}')
-        procedimiento(busqueda, r, False)
+        procedimiento(busqueda, r, False, cervezas_pandas_temporal)
 
-def procedimiento(busqueda, r, verdad): 
-    r = list(map(lambda x: x[busqueda], cervezas))
+def procedimiento(busqueda, r, verdad, lista_pandas): 
     minimo = min(r)
     maximo = max(r)
     n = len(r)
