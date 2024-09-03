@@ -66,7 +66,7 @@ def busqueda_parcial(busqueda):
         cervezas_pandas_temporal = pd.DataFrame(r)
         r = list(map(lambda x: x[busqueda], r))
         print(f'Cálculos de la variable {busqueda} de tipo {esto}')
-        procedimiento(busqueda, r, False, cervezas_pandas_temporal)
+        procedimiento(busqueda, r, True, cervezas_pandas_temporal)
 
 def procedimiento(busqueda, r, verdad, lista_pandas): 
     minimo = min(r)
@@ -123,7 +123,8 @@ def procedimiento(busqueda, r, verdad, lista_pandas):
             try: lista[esto] += 1
             except: lista[esto] = 1
         pprint(lista)
-        print(len(lista.items()))
+        # print(len(lista.items()))
+        # if verdad: diagramar(busqueda, list(lista.keys()), lista_pandas)
         return
     oficial[0]['fi.xi'] = [(xi * fi) for xi, fi in zip(oficial[0]['fi'], oficial[0]['xi'])]
     oficial[0]['fsr'] = list(map(lambda x: x / oficial[0]['fa'][-1], oficial[0]['fi']))
@@ -212,7 +213,7 @@ def procedimiento(busqueda, r, verdad, lista_pandas):
         resultado = (res2 - res1) * 100
         print(f'Porcentaje de que las calorías estén entre 150 y 180: {resultado}%')
     print('*' * 50)
-    if verdad: diagramar(busqueda, plana)
+    if verdad: diagramar(busqueda, plana, lista_pandas)
 
 def buscar_modales(fi : list): 
     lista = []
@@ -258,16 +259,16 @@ def obtencion(lista, numero):
     esto = li + ((numero - fa_numero) / fi_numero) * amplitud
     return esto
 
-def diagramar(busqueda, lista): 
+def diagramar(busqueda, lista, lista_pandas): 
     # pprint(cervezas_pandas)
 
     f, ax = plt.subplots(figsize=(7, 5))
     sns.despine(f)
 
     sns.histplot(
-        cervezas_pandas,
+        lista_pandas,
         x=busqueda, 
-        # hue="TipoCerveza",
+        # hue="PaisOrigen",
         # multiple="stack",
         # palette="light:m_r",
         edgecolor=".3",
